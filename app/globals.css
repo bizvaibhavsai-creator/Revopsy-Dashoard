@@ -1,26 +1,259 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* These are the DEFAULT (dark) values — used as Tailwind class references.
+     Actual runtime colors come from CSS custom properties below. */
+  --color-background: var(--bg);
+  --color-surface: var(--srf);
+  --color-surface-hover: var(--srf-hover);
+  --color-surface-active: var(--srf-active);
+  --color-border: var(--brd);
+  --color-border-subtle: var(--brd-subtle);
+
+  --color-primary: #E85D3A;
+  --color-primary-hover: #D14E2E;
+  --color-secondary: #F4A261;
+
+  --color-text-primary: var(--txt);
+  --color-text-secondary: var(--txt-sec);
+  --color-text-muted: var(--txt-mut);
+
+  --color-success: #34D399;
+  --color-danger: #F87171;
+  --color-warning: #FBBF24;
+
+  --color-instantly: #E85D3A;
+  --color-heyreach: #F4A261;
+
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+
+  --font-sans: var(--font-geist-sans, "Helvetica Neue"), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono, "SFMono-Regular"), ui-monospace, monospace;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ── Dark Theme (default) ─────────────────────────── */
+:root,
+[data-theme="dark"] {
+  --bg: #0F0F12;
+  --srf: #1A1A23;
+  --srf-hover: #22222E;
+  --srf-active: #2A2A3A;
+  --brd: #2A2A3A;
+  --brd-subtle: #1F1F2E;
+  --txt: #F1F1F4;
+  --txt-sec: #C4C4D4;
+  --txt-mut: #8B8B9E;
+  --tooltip-bg: #1A1A23;
+  --tooltip-border: #2A2A3A;
+  --tooltip-text: #F1F1F4;
+  --card-shadow: rgba(0, 0, 0, 0.3);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ── Light Theme ──────────────────────────────────── */
+[data-theme="light"] {
+  --bg: #F5F5F7;
+  --srf: #FFFFFF;
+  --srf-hover: #F0F0F3;
+  --srf-active: #E8E8ED;
+  --brd: #E0E0E8;
+  --brd-subtle: #EBEBF0;
+  --txt: #1A1A2E;
+  --txt-sec: #4A4A64;
+  --txt-mut: #8B8B9E;
+  --tooltip-bg: #FFFFFF;
+  --tooltip-border: #E0E0E8;
+  --tooltip-text: #1A1A2E;
+  --card-shadow: rgba(0, 0, 0, 0.08);
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    font-size: 1rem;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--txt);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  /* Focus states for accessibility */
+  *:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--bg);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--srf-active);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--txt-mut);
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Skeleton loader animation */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(90deg,
+      var(--srf) 25%,
+      var(--srf-hover) 50%,
+      var(--srf) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--radius-md);
+}
+
+/* Card hover lift effect */
+.card-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px var(--card-shadow);
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+/* Stagger children animations */
+.stagger-children>* {
+  opacity: 0;
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+.stagger-children>*:nth-child(1) {
+  animation-delay: 0.05s;
+}
+
+.stagger-children>*:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.stagger-children>*:nth-child(3) {
+  animation-delay: 0.15s;
+}
+
+.stagger-children>*:nth-child(4) {
+  animation-delay: 0.2s;
+}
+
+.stagger-children>*:nth-child(5) {
+  animation-delay: 0.25s;
+}
+
+.stagger-children>*:nth-child(6) {
+  animation-delay: 0.3s;
+}
+
+/* Smooth theme transitions for common elements */
+.theme-transition {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.grid-fade {
+  background-image:
+    linear-gradient(rgba(224, 224, 224, 0.14) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(224, 224, 224, 0.14) 1px, transparent 1px);
+  background-position: -1px -1px;
+  background-size: 40px 40px;
+  mask-image: linear-gradient(to left, black 0%, black 42%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to left, black 0%, black 42%, transparent 100%);
+}
+
+.section-grid {
+  background-image:
+    linear-gradient(rgba(160, 126, 94, 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(160, 126, 94, 0.12) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+.hero-grid {
+  opacity: 0.95;
+  background-image:
+    linear-gradient(rgba(228, 224, 218, 0.14) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(228, 224, 218, 0.14) 1px, transparent 1px);
+  background-position: top left;
+  background-size: 36px 36px;
+}
+
+.hero-grid-fade {
+  background: linear-gradient(
+    90deg,
+    #1d1d1d 0%,
+    #1d1d1d 18%,
+    rgba(29, 29, 29, 0.96) 28%,
+    rgba(29, 29, 29, 0.78) 36%,
+    rgba(29, 29, 29, 0.42) 46%,
+    rgba(29, 29, 29, 0.12) 55%,
+    rgba(29, 29, 29, 0.04) 62%,
+    rgba(29, 29, 29, 0.08) 74%,
+    rgba(29, 29, 29, 0.18) 100%
+  );
+  pointer-events: none;
+}
+
+.hero-grid-fade::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(240, 138, 66, 0.06), transparent 20%),
+    linear-gradient(90deg, transparent 0%, rgba(20, 20, 20, 0.1) 100%);
+  mix-blend-mode: screen;
 }
