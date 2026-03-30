@@ -17,6 +17,7 @@ import { useDashboardStore } from "@/lib/store";
 import { useInstantly } from "@/hooks/use-instantly";
 import { useHeyReach } from "@/hooks/use-heyreach";
 import { CHART_COLORS } from "@/lib/constants";
+import { getTooltipStyle } from "@/lib/chart-styles";
 
 export default function ChannelAnalyticsChart() {
     const { timeRange } = useDashboardStore();
@@ -32,7 +33,8 @@ export default function ChannelAnalyticsChart() {
     return (
         <section
             id="analytics"
-            className="animate-fade-in rounded-xl border border-border bg-surface p-5"
+            className="animate-fade-in rounded-2xl bg-surface p-6"
+            style={{ boxShadow: "var(--card-shadow)" }}
         >
             {/* Header */}
             <div className="mb-5 flex items-center justify-between">
@@ -80,28 +82,22 @@ export default function ChannelAnalyticsChart() {
                                 <stop offset="100%" stopColor={CHART_COLORS.heyreach} stopOpacity={0} />
                             </linearGradient>
                         </defs>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#2A2A3A" vertical={false} />
+                        <CartesianGrid strokeDasharray="3 3" stroke="var(--brd)" vertical={false} />
                         <XAxis
                             dataKey="date"
                             axisLine={false}
                             tickLine={false}
-                            tick={{ fill: "#8B8B9E", fontSize: 11 }}
+                            tick={{ fill: "var(--txt-mut)", fontSize: 11 }}
                             dy={8}
                         />
                         <YAxis
                             axisLine={false}
                             tickLine={false}
-                            tick={{ fill: "#8B8B9E", fontSize: 11 }}
+                            tick={{ fill: "var(--txt-mut)", fontSize: 11 }}
                             dx={-5}
                         />
                         <Tooltip
-                            contentStyle={{
-                                backgroundColor: "#1A1A23",
-                                border: "1px solid #2A2A3A",
-                                borderRadius: "8px",
-                                color: "#F1F1F4",
-                                fontSize: "12px",
-                            }}
+                            contentStyle={getTooltipStyle()}
                         />
                         <Legend
                             verticalAlign="top"

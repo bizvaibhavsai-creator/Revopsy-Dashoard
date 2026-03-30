@@ -53,7 +53,7 @@ export const useSettingsStore = create<SettingsState>()(
                 set((state) => ({
                     channelSpend: { ...state.channelSpend, ...spend },
                 })),
-            sidebarCollapsed: false,
+            sidebarCollapsed: true,
             toggleSidebar: () =>
                 set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
             theme: "dark" as Theme,

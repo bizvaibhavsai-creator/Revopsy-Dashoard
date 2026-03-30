@@ -14,13 +14,13 @@ export default function ViewModeToggle() {
     const { viewMode, setViewMode } = useDashboardStore();
 
     return (
-        <div className="flex items-center rounded-lg border border-border bg-background p-0.5">
+        <div className="flex items-center rounded-full bg-surface p-0.5 shadow-sm">
             {MODES.map((mode) => (
                 <button
                     key={mode.value}
                     onClick={() => setViewMode(mode.value)}
                     className={cn(
-                        "flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-all",
+                        "flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all",
                         viewMode === mode.value
                             ? "bg-primary text-white shadow-sm"
                             : "text-text-muted hover:text-text-primary"

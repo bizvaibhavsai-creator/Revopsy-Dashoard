@@ -1,11 +1,50 @@
 import { NextRequest, NextResponse } from "next/server";
-import { fetchInstantlyCampaigns, fetchInstantlyAnalyticsOverview } from "@/lib/api/instantly";
+import {
+    fetchInstantlyCampaigns,
+    fetchInstantlyAnalyticsOverview,
+    fetchInstantlyCampaignAnalytics,
+} from "@/lib/api/instantly";
+
+/**
+ * Normalize raw Instantly analytics into the shape the frontend expects.
+ */
+function normalizeAnalytics(raw: {
+    emails_sent_count?: number;
+    open_count_unique?: number;
+    new_leads_contacted_count?: number;
+    reply_count_unique?: number;
+    total_interested?: number;
+    total_opportunities?: number;
+    reply_count?: number;
+    bounced_count?: number;
+    unsubscribed_count?: number;
+    total_meeting_booked?: number;
+    total_meeting_completed?: number;
+    total_opportunity_value?: number;
+    contacted_count?: number;
+}) {
+    return {
+        total_emails_sent: raw.emails_sent_count ?? 0,
+        emails_read: raw.open_count_unique ?? 0,
+        new_leads_contacted: raw.new_leads_contacted_count ?? 0,
+        leads_replied: raw.reply_count_unique ?? 0,
+        leads_interested: raw.total_interested ?? 0,
+        total_opportunities: raw.total_opportunities ?? 0,
+        total_replies: raw.reply_count ?? 0,
+        bounced: raw.bounced_count ?? 0,
+        unsubscribed: raw.unsubscribed_count ?? 0,
+        total_meeting_booked: raw.total_meeting_booked ?? 0,
+        total_meeting_completed: raw.total_meeting_completed ?? 0,
+        total_opportunity_value: raw.total_opportunity_value ?? 0,
+        contacted_count: raw.contacted_count ?? 0,
+    };
+}
 
 /**
  * GET /api/instantly
  * Proxy route for Instantly.ai API.
  * API key is sent via X-Instantly-Key header from the client.
- * Returns per-campaign analytics so the leaderboard has real data.
+ * Returns normalized overview analytics + per-campaign analytics.
  */
 export async function GET(request: NextRequest) {
     const apiKey = request.headers.get("X-Instantly-Key");
@@ -15,80 +54,32 @@ export async function GET(request: NextRequest) {
     }
 
     try {
-        // Fetch campaigns and analytics overview in parallel
-        const [campaignsRes, analyticsRes] = await Promise.all([
+        // Fetch campaigns and global analytics overview in parallel
+        const [campaignsRes, rawAnalytics] = await Promise.all([
             fetchInstantlyCampaigns(apiKey),
             fetchInstantlyAnalyticsOverview(apiKey),
         ]);
 
-        // Build per-campaign analytics map
-        const perCampaignMap = new Map<string, {
-            total_emails_sent: number;
-            emails_read: number;
-            new_leads_contacted: number;
-            leads_replied: number;
-            leads_interested: number;
-            total_opportunities: number;
-            total_replies: number;
-            bounced: number;
-            unsubscribed: number;
-        }>();
+        const overview = normalizeAnalytics(rawAnalytics);
+        const campaignItems = campaignsRes?.items || [];
 
-        if (Array.isArray(analyticsRes)) {
-            for (const item of analyticsRes) {
-                if (item.campaign_id) {
-                    perCampaignMap.set(item.campaign_id, item);
-                }
-            }
-        }
-
-        // Aggregate overview across all campaigns
-        const overview = Array.isArray(analyticsRes)
-            ? analyticsRes.reduce(
-                  (acc, item) => ({
-                      total_emails_sent: acc.total_emails_sent + (item.total_emails_sent || 0),
-                      emails_read: acc.emails_read + (item.emails_read || 0),
-                      new_leads_contacted: acc.new_leads_contacted + (item.new_leads_contacted || 0),
-                      leads_replied: acc.leads_replied + (item.leads_replied || 0),
-                      leads_interested: acc.leads_interested + (item.leads_interested || 0),
-                      total_opportunities: acc.total_opportunities + (item.total_opportunities || 0),
-                      total_replies: acc.total_replies + (item.total_replies || 0),
-                      bounced: acc.bounced + (item.bounced || 0),
-                      unsubscribed: acc.unsubscribed + (item.unsubscribed || 0),
-                  }),
-                  {
-                      total_emails_sent: 0,
-                      emails_read: 0,
-                      new_leads_contacted: 0,
-                      leads_replied: 0,
-                      leads_interested: 0,
-                      total_opportunities: 0,
-                      total_replies: 0,
-                      bounced: 0,
-                      unsubscribed: 0,
-                  }
-              )
-            : analyticsRes;
+        // Fetch per-campaign analytics in parallel (batched to avoid rate limits)
+        const perCampaignResults = await Promise.allSettled(
+            campaignItems.map((c) => fetchInstantlyCampaignAnalytics(apiKey, c.id))
+        );
 
         // Map campaigns with their individual analytics
-        const campaigns = (campaignsRes?.items || []).map((c) => {
-            const stats = perCampaignMap.get(c.id);
+        const campaigns = campaignItems.map((c, i) => {
+            const result = perCampaignResults[i];
+            const analytics =
+                result.status === "fulfilled" ? normalizeAnalytics(result.value) : undefined;
+
             return {
                 id: c.id,
                 name: c.name,
                 status: c.status,
-                timestamp: c.timestamp,
-                analytics: stats ? {
-                    totalEmailsSent: stats.total_emails_sent,
-                    emailsRead: stats.emails_read,
-                    newLeadsContacted: stats.new_leads_contacted,
-                    leadsReplied: stats.leads_replied,
-                    leadsInterested: stats.leads_interested,
-                    totalOpportunities: stats.total_opportunities,
-                    totalReplies: stats.total_replies,
-                    bounced: stats.bounced,
-                    unsubscribed: stats.unsubscribed,
-                } : undefined,
+                timestamp: c.timestamp_updated || c.timestamp_created,
+                analytics,
             };
         });
 

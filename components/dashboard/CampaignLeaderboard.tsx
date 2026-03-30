@@ -68,18 +68,18 @@ export default function CampaignLeaderboard() {
             if (iConnected && instantlyData?.campaigns) {
                 for (const c of instantlyData.campaigns) {
                     const a = c.analytics;
-                    const emailsSent = a?.totalEmailsSent ?? 0;
-                    const emailsRead = a?.emailsRead ?? 0;
-                    const replies = a?.totalReplies ?? 0;
-                    const interested = a?.leadsInterested ?? 0;
-                    const opps = a?.totalOpportunities ?? 0;
-                    const leadsContacted = a?.newLeadsContacted ?? emailsSent;
+                    const leadsContacted = a?.new_leads_contacted ?? 0;
+                    const emailsSent = a?.total_emails_sent ?? 0;
+                    const emailsRead = a?.emails_read ?? 0;
+                    const replies = a?.total_replies ?? 0;
+                    const interested = a?.leads_interested ?? 0;
+                    const meetings = a?.total_meeting_booked ?? 0;
                     rawCampaigns.push({
                         id: c.id, name: c.name, platform: "instantly",
                         leads: leadsContacted,
                         replyRate: leadsContacted > 0 ? +((replies / leadsContacted) * 100).toFixed(1) : 0,
                         positiveReplies: interested,
-                        meetingsBooked: opps,
+                        meetingsBooked: meetings,
                         openRate: emailsSent > 0 ? +((emailsRead / emailsSent) * 100).toFixed(1) : undefined,
                         status: mapInstantlyStatus(c.status),
                         lastUpdated: c.timestamp
@@ -153,9 +153,9 @@ export default function CampaignLeaderboard() {
     const criticalCt = campaignsWithHealth.filter((c) => c.health.level === "critical").length;
 
     return (
-        <section id="campaigns" className="animate-fade-in rounded-xl border border-border bg-surface">
+        <section id="campaigns" className="animate-fade-in rounded-2xl bg-surface overflow-hidden" style={{ boxShadow: "var(--card-shadow)" }}>
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-border p-5">
+            <div className="flex items-center justify-between border-b border-border-subtle p-6">
                 <div>
                     <h2 className="text-base font-semibold text-text-primary">Campaign Leaderboard</h2>
                     <div className="mt-1 flex items-center gap-3 text-xs text-text-muted">

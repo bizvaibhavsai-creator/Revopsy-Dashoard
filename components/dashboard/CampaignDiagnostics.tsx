@@ -38,7 +38,7 @@ interface CampaignDiagnosticsProps {
 
 export default function CampaignDiagnostics({ diagnostics, campaignName }: CampaignDiagnosticsProps) {
     return (
-        <div className="space-y-3 rounded-lg border border-border-subtle bg-background/50 p-4">
+        <div className="space-y-3 rounded-xl bg-background/50 p-5">
             <p className="text-xs font-medium uppercase tracking-wider text-text-muted">
                 Diagnostics for &quot;{campaignName}&quot;
             </p>
@@ -48,7 +48,7 @@ export default function CampaignDiagnostics({ diagnostics, campaignName }: Campa
                 return (
                     <div
                         key={idx}
-                        className={cn("rounded-lg border p-3", classes.border, "bg-surface")}
+                        className={cn("rounded-xl p-4 shadow-sm", "bg-surface")}
                     >
                         <div className="mb-2 flex items-center gap-2">
                             <div className={cn("flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-medium", classes.bg, classes.text)}>
@@ -58,7 +58,7 @@ export default function CampaignDiagnostics({ diagnostics, campaignName }: Campa
                         </div>
                         <p className="mb-1 text-sm font-medium text-text-primary">{issue.title}</p>
                         <p className="mb-2 text-xs text-text-muted">{issue.description}</p>
-                        <div className="flex items-start gap-1.5 rounded-md bg-primary/5 p-2">
+                        <div className="flex items-start gap-1.5 rounded-xl bg-primary/5 p-3">
                             <Lightbulb size={12} className="mt-0.5 shrink-0 text-primary" />
                             <p className="text-xs text-primary">{issue.recommendation}</p>
                         </div>

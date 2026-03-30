@@ -8,6 +8,7 @@ import { getInstantlyMetrics } from "@/lib/mock-data";
 import { useDashboardStore } from "@/lib/store";
 import { useInstantly } from "@/hooks/use-instantly";
 import { CHART_COLORS } from "@/lib/constants";
+import { getTooltipStyle } from "@/lib/chart-styles";
 
 interface MetricItemProps {
     label: string;
@@ -21,7 +22,7 @@ function MetricItem({ label, value, change, icon }: MetricItemProps) {
     return (
         <div className="flex items-center justify-between py-3">
             <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-instantly/10 text-instantly">
+                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-instantly/10 text-instantly">
                     {icon}
                 </div>
                 <div>
@@ -73,7 +74,7 @@ export default function InstantlyCard() {
               totalEmailsSent: apiData.overview!.total_emails_sent,
               totalResponses: apiData.overview!.total_replies,
               positiveResponses: apiData.overview!.leads_interested,
-              meetingsBooked: apiData.overview!.total_opportunities,
+              meetingsBooked: apiData.overview!.total_meeting_booked,
           }
         : {
               totalEmailsSent: mockData.totalEmailsSent,
@@ -89,11 +90,11 @@ export default function InstantlyCard() {
     const showChart = chartData.length > 0;
 
     return (
-        <article className="card-hover rounded-xl border border-border bg-surface p-5 animate-fade-in">
+        <article className="card-hover rounded-2xl bg-surface p-6 animate-fade-in" style={{ boxShadow: "var(--card-shadow)" }}>
             {/* Header */}
             <div className="mb-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-instantly/15 font-bold text-instantly">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-instantly/15 font-bold text-instantly">
                         <Mail size={20} />
                     </div>
                     <div>
@@ -129,13 +130,7 @@ export default function InstantlyCard() {
                                 </linearGradient>
                             </defs>
                             <Tooltip
-                                contentStyle={{
-                                    backgroundColor: "#1A1A23",
-                                    border: "1px solid #2A2A3A",
-                                    borderRadius: "8px",
-                                    color: "#F1F1F4",
-                                    fontSize: "12px",
-                                }}
+                                contentStyle={getTooltipStyle()}
                                 labelFormatter={() => ""}
                             />
                             <Area

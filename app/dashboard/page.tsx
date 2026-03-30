@@ -10,14 +10,15 @@ import ROICards from "@/components/dashboard/ROICards";
 import ForecastPacing from "@/components/dashboard/ForecastPacing";
 import RecommendationsPanel from "@/components/dashboard/RecommendationsPanel";
 import TimeRangeToggle from "@/components/shared/TimeRangeToggle";
+import ViewModeToggle from "@/components/shared/ViewModeToggle";
 
 export default function DashboardPage() {
     const { viewMode } = useDashboardStore();
 
     return (
-        <div className="mx-auto max-w-7xl space-y-6">
-            {/* Time Range Filter */}
-            <div className="flex items-center justify-between">
+        <div className="space-y-8">
+            {/* Header — Title + Toggle Controls */}
+            <div className="flex flex-wrap items-center justify-between gap-4">
                 <div>
                     <h1 className="text-xl font-bold text-text-primary">
                         {viewMode === "exec" ? "Executive Overview" : "Operator Dashboard"}
@@ -28,14 +29,17 @@ export default function DashboardPage() {
                             : "Campaign health, diagnostics, and daily operations"}
                     </p>
                 </div>
-                <TimeRangeToggle />
+                <div className="flex items-center gap-3">
+                    <ViewModeToggle />
+                    <TimeRangeToggle />
+                </div>
             </div>
 
             {viewMode === "exec" ? (
                 /* ─── EXEC VIEW ─── */
                 <>
                     {/* Top KPIs: Aggregated + Pacing */}
-                    <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                         <AggregatedCard />
                         <ForecastPacing />
                     </div>
@@ -53,14 +57,14 @@ export default function DashboardPage() {
                 /* ─── OPERATOR VIEW ─── */
                 <>
                     {/* Platform Cards */}
-                    <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+                    <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                         <InstantlyCard />
                         <HeyReachCard />
                         <AggregatedCard />
                     </div>
 
                     {/* Pacing + Recommendations side by side */}
-                    <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+                    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                         <ForecastPacing />
                         <RecommendationsPanel />
                     </div>

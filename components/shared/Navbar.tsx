@@ -1,36 +1,22 @@
 "use client";
 
-import { Search, Bell, User, Sun, Moon } from "lucide-react";
-import { useEffect, useState, useMemo } from "react";
+import { Search, Bell, User, Sun, Moon, Menu } from "lucide-react";
+import { useMemo, useState } from "react";
 import { useSettingsStore } from "@/lib/store";
 import { getCampaigns } from "@/lib/mock-data";
 import { generateAlerts, formatRelativeTime } from "@/lib/anomaly-detection";
 import { useInstantly } from "@/hooks/use-instantly";
 import { useHeyReach } from "@/hooks/use-heyreach";
-import ViewModeToggle from "./ViewModeToggle";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import type { Alert, Campaign } from "@/types/dashboard";
+import type { Campaign } from "@/types/dashboard";
 
 export default function Navbar() {
-    const [currentDate, setCurrentDate] = useState("");
-    const { theme, toggleTheme } = useSettingsStore();
+    const { theme, toggleTheme, toggleSidebar } = useSettingsStore();
     const [showAlerts, setShowAlerts] = useState(false);
 
     const { data: iData, isConfigured: iConn } = useInstantly();
     const { data: hData, isConfigured: hConn } = useHeyReach();
-
-    useEffect(() => {
-        const now = new Date();
-        setCurrentDate(
-            now.toLocaleDateString("en-US", {
-                weekday: "short",
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-            })
-        );
-    }, []);
 
     // Generate alerts for notification bell
     const alerts = useMemo(() => {
@@ -72,30 +58,49 @@ export default function Navbar() {
     const criticalCount = alerts.filter((a) => a.severity === "critical" && !a.read).length;
 
     return (
-        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-surface/80 px-6 backdrop-blur-md">
-            {/* Left — Date & Greeting */}
+        <header
+            className="sticky top-0 z-30 flex h-16 items-center justify-between bg-surface/95 px-6 sm:px-8 backdrop-blur-xl"
+            style={{ boxShadow: "var(--nav-shadow)" }}
+        >
+            {/* Left — Hamburger + Logo + Product Name */}
             <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-sm font-semibold text-text-primary">
-                        {new Date().getDate()}
+                <button
+                    onClick={toggleSidebar}
+                    aria-label="Open navigation"
+                    className="flex h-10 w-10 items-center justify-center rounded-full text-text-muted transition-colors hover:bg-surface-hover hover:text-text-primary"
+                >
+                    <Menu size={20} />
+                </button>
+                <Link href="/dashboard" className="flex items-center gap-3">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl bg-primary font-bold text-white text-sm">
+                        R
                     </div>
-                    <div>
-                        <p className="text-sm font-medium text-text-primary">{currentDate}</p>
-                        <p className="text-xs text-text-muted">Welcome back 👋</p>
+                    <div className="hidden sm:block">
+                        <span className="text-base font-semibold text-text-primary">RevOps</span>
+                        <span className="ml-1.5 text-sm font-normal text-text-muted">Dashboard</span>
                     </div>
-                </div>
+                </Link>
             </div>
 
-            {/* Right — View Toggle, Theme, Search, Notifications, Profile */}
-            <div className="flex items-center gap-3">
-                {/* Exec / Operator Toggle */}
-                <ViewModeToggle />
+            {/* Right — Search, Theme, Notifications, Profile */}
+            <div className="flex items-center gap-2">
+                {/* Search */}
+                <button
+                    aria-label="Search (Cmd+K)"
+                    className="flex h-10 items-center gap-2 rounded-full bg-surface-hover/60 px-4 text-sm text-text-muted transition-colors hover:bg-surface-hover hover:text-text-secondary"
+                >
+                    <Search size={15} />
+                    <span className="hidden md:inline">Search...</span>
+                    <kbd className="ml-1 hidden rounded-md bg-surface-active/60 px-1.5 py-0.5 text-[10px] text-text-muted md:inline">
+                        ⌘K
+                    </kbd>
+                </button>
 
                 {/* Theme Toggle */}
                 <button
                     onClick={toggleTheme}
                     aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
-                    className="relative flex h-10 w-10 items-center justify-center rounded-lg border border-border text-text-muted transition-all hover:bg-surface-hover hover:text-text-primary"
+                    className="relative flex h-10 w-10 items-center justify-center rounded-full text-text-muted transition-all hover:bg-surface-hover hover:text-text-primary"
                 >
                     <Sun
                         size={18}
@@ -113,24 +118,12 @@ export default function Navbar() {
                     />
                 </button>
 
-                {/* Search */}
-                <button
-                    aria-label="Search (Cmd+K)"
-                    className="flex h-10 items-center gap-2 rounded-lg border border-border bg-background px-3 text-sm text-text-muted transition-colors hover:border-text-muted hover:text-text-secondary"
-                >
-                    <Search size={16} />
-                    <span className="hidden sm:inline">Search...</span>
-                    <kbd className="ml-2 hidden rounded border border-border-subtle bg-surface px-1.5 py-0.5 text-xs text-text-muted sm:inline">
-                        ⌘K
-                    </kbd>
-                </button>
-
                 {/* Notifications Bell */}
                 <div className="relative">
                     <button
                         onClick={() => setShowAlerts(!showAlerts)}
                         aria-label="View notifications"
-                        className="relative flex h-10 w-10 items-center justify-center rounded-lg text-text-muted transition-colors hover:bg-surface-hover hover:text-text-primary"
+                        className="relative flex h-10 w-10 items-center justify-center rounded-full text-text-muted transition-colors hover:bg-surface-hover hover:text-text-primary"
                     >
                         <Bell size={18} />
                         {unreadCount > 0 && (
@@ -147,8 +140,11 @@ export default function Navbar() {
                     {showAlerts && (
                         <>
                             <div className="fixed inset-0 z-40" onClick={() => setShowAlerts(false)} />
-                            <div className="absolute right-0 top-12 z-50 w-80 rounded-xl border border-border bg-surface shadow-2xl">
-                                <div className="flex items-center justify-between border-b border-border px-4 py-3">
+                            <div
+                                className="absolute right-0 top-12 z-50 w-80 rounded-2xl bg-surface"
+                                style={{ boxShadow: "0 8px 40px rgba(0,0,0,0.15)" }}
+                            >
+                                <div className="flex items-center justify-between border-b border-border-subtle px-4 py-3">
                                     <p className="text-sm font-semibold text-text-primary">Notifications</p>
                                     <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">
                                         {unreadCount} new
@@ -174,11 +170,11 @@ export default function Navbar() {
                                         </div>
                                     ))}
                                 </div>
-                                <div className="border-t border-border p-2">
+                                <div className="border-t border-border-subtle p-2">
                                     <Link
                                         href="/dashboard/command-center"
                                         onClick={() => setShowAlerts(false)}
-                                        className="flex items-center justify-center rounded-lg px-3 py-2 text-xs font-medium text-primary transition-colors hover:bg-primary/10"
+                                        className="flex items-center justify-center rounded-xl px-3 py-2 text-xs font-medium text-primary transition-colors hover:bg-primary/10"
                                     >
                                         View all in Command Center →
                                     </Link>
@@ -191,9 +187,9 @@ export default function Navbar() {
                 {/* User Profile */}
                 <button
                     aria-label="User menu"
-                    className="flex h-10 items-center gap-2 rounded-lg px-2 text-text-secondary transition-colors hover:bg-surface-hover"
+                    className="flex h-10 items-center gap-2 rounded-full px-2 text-text-secondary transition-colors hover:bg-surface-hover"
                 >
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/20 text-sm font-semibold text-primary">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/15 text-sm font-semibold text-primary">
                         <User size={16} />
                     </div>
                     <span className="hidden text-sm font-medium md:inline">Admin</span>

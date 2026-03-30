@@ -76,8 +76,8 @@ export default function RecommendationsPanel() {
     const recs = useMemo(() => generateRecommendations(campaigns), [campaigns]);
 
     return (
-        <section className="animate-fade-in rounded-xl border border-border bg-surface">
-            <div className="flex items-center justify-between border-b border-border p-5">
+        <section className="animate-fade-in rounded-2xl bg-surface overflow-hidden" style={{ boxShadow: "var(--card-shadow)" }}>
+            <div className="flex items-center justify-between border-b border-border-subtle p-6">
                 <div className="flex items-center gap-2">
                     <Lightbulb size={18} className="text-primary" />
                     <div>
@@ -92,7 +92,7 @@ export default function RecommendationsPanel() {
                     const priority = PRIORITY_COLORS[rec.priority];
                     return (
                         <div key={rec.id} className="flex items-start gap-3 p-4 transition-colors hover:bg-surface-hover/50">
-                            <div className={cn("mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg", priority.bg, priority.text)}>
+                            <div className={cn("mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl", priority.bg, priority.text)}>
                                 {TYPE_ICONS[rec.type]}
                             </div>
                             <div className="flex-1 min-w-0">

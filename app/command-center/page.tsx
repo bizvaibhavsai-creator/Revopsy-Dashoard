@@ -34,8 +34,8 @@ function SystemStatusCard({
 }) {
     return (
         <div className={cn(
-            "flex items-center gap-3 rounded-lg border p-3",
-            connected ? "border-success/30 bg-success/5" : "border-border-subtle bg-surface"
+            "flex items-center gap-3 rounded-xl p-3",
+            connected ? "bg-success/5" : "bg-surface-hover/50"
         )}>
             <div className={cn("flex h-8 w-8 items-center justify-center rounded-lg", connected ? "bg-success/15 text-success" : "bg-text-muted/10 text-text-muted")}>
                 {icon}
@@ -53,15 +53,15 @@ function SystemStatusCard({
 
 function FeedItemCard({ item }: { item: FeedItem }) {
     const severityClasses = {
-        healthy: "border-success/20 bg-success/5",
-        warning: "border-warning/20 bg-warning/5",
-        critical: "border-danger/20 bg-danger/5",
+        healthy: "bg-success/5",
+        warning: "bg-warning/5",
+        critical: "bg-danger/5",
     };
 
     return (
         <div className={cn(
-            "flex items-start gap-3 rounded-lg border p-3 transition-colors hover:bg-surface-hover/50",
-            item.severity ? severityClasses[item.severity] : "border-border-subtle"
+            "flex items-start gap-3 rounded-xl p-3 transition-colors hover:bg-surface-hover/50",
+            item.severity ? severityClasses[item.severity] : ""
         )}>
             <span className="mt-0.5 text-base">{item.icon}</span>
             <div className="flex-1 min-w-0">
@@ -124,12 +124,12 @@ export default function CommandCenterPage() {
     const warningCount = alerts.filter((a) => a.severity === "warning" && !a.read).length;
 
     return (
-        <main className="min-h-screen bg-background">
-            <div className="mx-auto max-w-5xl px-6 py-10">
+        <main>
+            <div className="mx-auto max-w-5xl">
                 {/* Header */}
                 <div className="mb-8 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/15 text-primary">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/15 text-primary">
                             <Radio size={20} />
                         </div>
                         <div>
@@ -145,19 +145,19 @@ export default function CommandCenterPage() {
 
                 {/* Summary Cards */}
                 <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-4">
-                    <div className="rounded-xl border border-border bg-surface p-4 text-center">
+                    <div className="rounded-2xl bg-surface p-4 text-center" style={{ boxShadow: "var(--card-shadow)" }}>
                         <p className="text-xs text-text-muted">Total Alerts</p>
                         <p className="text-2xl font-bold text-text-primary">{alerts.length}</p>
                     </div>
-                    <div className="rounded-xl border border-danger/30 bg-danger/5 p-4 text-center">
+                    <div className="rounded-2xl bg-danger/5 p-4 text-center" style={{ boxShadow: "var(--card-shadow)" }}>
                         <p className="text-xs text-danger">Critical</p>
                         <p className="text-2xl font-bold text-danger">{criticalCount}</p>
                     </div>
-                    <div className="rounded-xl border border-warning/30 bg-warning/5 p-4 text-center">
+                    <div className="rounded-2xl bg-warning/5 p-4 text-center" style={{ boxShadow: "var(--card-shadow)" }}>
                         <p className="text-xs text-warning">Warnings</p>
                         <p className="text-2xl font-bold text-warning">{warningCount}</p>
                     </div>
-                    <div className="rounded-xl border border-success/30 bg-success/5 p-4 text-center">
+                    <div className="rounded-2xl bg-success/5 p-4 text-center" style={{ boxShadow: "var(--card-shadow)" }}>
                         <p className="text-xs text-success">Systems OK</p>
                         <p className="text-2xl font-bold text-success">{(iConn ? 1 : 0) + (hConn ? 1 : 0)}/2</p>
                     </div>
@@ -166,8 +166,8 @@ export default function CommandCenterPage() {
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
                     {/* Live Feed */}
                     <div className="lg:col-span-2">
-                        <div className="rounded-xl border border-border bg-surface">
-                            <div className="flex items-center justify-between border-b border-border p-4">
+                        <div className="rounded-2xl bg-surface overflow-hidden" style={{ boxShadow: "var(--card-shadow)" }}>
+                            <div className="flex items-center justify-between border-b border-border-subtle p-5">
                                 <h2 className="text-sm font-semibold text-text-primary">Live Feed</h2>
                                 <div className="flex gap-1">
                                     {(["all", "critical", "warning", "system"] as const).map((f) => (
@@ -175,7 +175,7 @@ export default function CommandCenterPage() {
                                             key={f}
                                             onClick={() => setFilter(f)}
                                             className={cn(
-                                                "rounded-md px-2.5 py-1 text-[11px] font-medium capitalize transition-colors",
+                                                "rounded-full px-2.5 py-1 text-[11px] font-medium capitalize transition-colors",
                                                 filter === f
                                                     ? "bg-primary/15 text-primary"
                                                     : "text-text-muted hover:text-text-primary"
@@ -201,7 +201,7 @@ export default function CommandCenterPage() {
                     {/* Sidebar */}
                     <div className="space-y-4">
                         {/* System Status */}
-                        <div className="rounded-xl border border-border bg-surface p-4">
+                        <div className="rounded-2xl bg-surface p-5" style={{ boxShadow: "var(--card-shadow)" }}>
                             <h3 className="mb-3 text-sm font-semibold text-text-primary">System Status</h3>
                             <div className="space-y-2">
                                 <SystemStatusCard
@@ -227,7 +227,7 @@ export default function CommandCenterPage() {
                         </div>
 
                         {/* Quick Actions */}
-                        <div className="rounded-xl border border-border bg-surface p-4">
+                        <div className="rounded-2xl bg-surface p-5" style={{ boxShadow: "var(--card-shadow)" }}>
                             <h3 className="mb-3 text-sm font-semibold text-text-primary">Quick Actions</h3>
                             <div className="space-y-2">
                                 <Link

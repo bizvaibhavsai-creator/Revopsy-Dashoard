@@ -19,7 +19,7 @@ export default function ForecastPacing() {
         let meetings: number;
         if (iConn || hConn) {
             meetings =
-                (iConn ? (iData?.overview?.total_opportunities ?? 0) : 0) +
+                (iConn ? (iData?.overview?.total_meeting_booked ?? 0) : 0) +
                 (hConn ? 0 : 0); // HeyReach doesn't track meetings directly
         } else {
             const iMetrics = getInstantlyMetrics(timeRange);
@@ -33,7 +33,7 @@ export default function ForecastPacing() {
     const pacingBarWidth = Math.min(100, pacing.pacingPercent);
 
     return (
-        <article className="animate-fade-in rounded-xl border border-border bg-surface p-5">
+        <article className="animate-fade-in rounded-2xl bg-surface p-6" style={{ boxShadow: "var(--card-shadow)" }}>
             {/* Header */}
             <div className="mb-4 flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -56,7 +56,7 @@ export default function ForecastPacing() {
                     <span>{pacing.currentWeekMeetings} of {pacing.weeklyTarget} meetings</span>
                     <span>{pacing.pacingPercent}%</span>
                 </div>
-                <div className="h-3 w-full overflow-hidden rounded-full bg-background">
+                <div className="h-2.5 w-full overflow-hidden rounded-full bg-background/80">
                     <div
                         className={cn(
                             "h-full rounded-full transition-all duration-700",
@@ -73,7 +73,7 @@ export default function ForecastPacing() {
 
             {/* Stats Grid */}
             <div className="grid grid-cols-2 gap-3">
-                <div className="rounded-lg bg-background/50 p-3">
+                <div className="rounded-xl bg-background/50 p-4">
                     <div className="mb-1 flex items-center gap-1.5 text-text-muted">
                         <TrendingUp size={12} />
                         <span className="text-xs">Daily Run Rate</span>
@@ -81,7 +81,7 @@ export default function ForecastPacing() {
                     <p className="text-lg font-bold text-text-primary">{pacing.dailyRunRate}</p>
                     <p className="text-[10px] text-text-muted">meetings / day</p>
                 </div>
-                <div className="rounded-lg bg-background/50 p-3">
+                <div className="rounded-xl bg-background/50 p-4">
                     <div className="mb-1 flex items-center gap-1.5 text-text-muted">
                         <Target size={12} />
                         <span className="text-xs">Required Rate</span>
@@ -91,7 +91,7 @@ export default function ForecastPacing() {
                     </p>
                     <p className="text-[10px] text-text-muted">meetings / day needed</p>
                 </div>
-                <div className="rounded-lg bg-background/50 p-3">
+                <div className="rounded-xl bg-background/50 p-4">
                     <div className="mb-1 flex items-center gap-1.5 text-text-muted">
                         <CalendarCheck size={12} />
                         <span className="text-xs">Projected Total</span>
@@ -101,7 +101,7 @@ export default function ForecastPacing() {
                     </p>
                     <p className="text-[10px] text-text-muted">meetings by week end</p>
                 </div>
-                <div className="rounded-lg bg-background/50 p-3">
+                <div className="rounded-xl bg-background/50 p-4">
                     <div className="mb-1 flex items-center gap-1.5 text-text-muted">
                         <Clock size={12} />
                         <span className="text-xs">Days Left</span>

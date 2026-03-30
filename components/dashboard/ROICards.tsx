@@ -16,7 +16,10 @@ import Link from "next/link";
 import { formatCurrency, formatNumber } from "@/lib/utils";
 import { getInstantlyMetrics, getHeyReachMetrics } from "@/lib/mock-data";
 import { useDashboardStore, useSettingsStore } from "@/lib/store";
+import { useInstantly } from "@/hooks/use-instantly";
+import { useHeyReach } from "@/hooks/use-heyreach";
 import { CHART_COLORS, AVG_DEAL_VALUE, MEETING_TO_OPP_RATE } from "@/lib/constants";
+import { getTooltipStyle } from "@/lib/chart-styles";
 import type { Platform } from "@/types/dashboard";
 
 interface ROICardConfig {
@@ -47,14 +50,24 @@ const CONFIGS: ROICardConfig[] = [
 function ROICardSingle({ config }: { config: ROICardConfig }) {
     const { timeRange } = useDashboardStore();
     const { channelSpend } = useSettingsStore();
+    const { data: instantlyData, isConfigured: iConnected } = useInstantly();
+    const { data: heyreachData, isConfigured: hConnected } = useHeyReach();
 
     const stats = useMemo(() => {
-        const metrics =
-            config.platform === "instantly"
-                ? getInstantlyMetrics(timeRange)
-                : getHeyReachMetrics(timeRange);
+        let meetings: number;
 
-        const meetings = metrics.meetingsBooked;
+        if (config.platform === "instantly" && iConnected && instantlyData?.overview) {
+            meetings = instantlyData.overview.total_meeting_booked;
+        } else if (config.platform === "heyreach" && hConnected) {
+            meetings = 0; // HeyReach doesn't track meetings directly
+        } else {
+            const metrics =
+                config.platform === "instantly"
+                    ? getInstantlyMetrics(timeRange)
+                    : getHeyReachMetrics(timeRange);
+            meetings = metrics.meetingsBooked;
+        }
+
         const spend = channelSpend[config.platform];
         const costPerMeeting = meetings > 0 ? spend / meetings : 0;
         const opportunities = Math.round(meetings * MEETING_TO_OPP_RATE);
@@ -62,7 +75,7 @@ function ROICardSingle({ config }: { config: ROICardConfig }) {
         const roi = spend > 0 ? ((pipelineValue - spend) / spend) * 100 : 0;
 
         return { meetings, spend, costPerMeeting, opportunities, pipelineValue, roi };
-    }, [timeRange, channelSpend, config.platform]);
+    }, [timeRange, channelSpend, config.platform, iConnected, hConnected, instantlyData, heyreachData]);
 
     const barData = [
         { name: "Spend", value: stats.spend, color: "#8B8B9E" },
@@ -70,7 +83,7 @@ function ROICardSingle({ config }: { config: ROICardConfig }) {
     ];
 
     return (
-        <article className="card-hover rounded-xl border border-border bg-surface p-5 animate-fade-in">
+        <article className="card-hover rounded-2xl bg-surface p-6 animate-fade-in" style={{ boxShadow: "var(--card-shadow)" }}>
             {/* Header */}
             <div className="mb-5 flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -93,28 +106,28 @@ function ROICardSingle({ config }: { config: ROICardConfig }) {
 
             {/* Metrics Grid */}
             <div className="mb-5 grid grid-cols-2 gap-3">
-                <div className="rounded-lg bg-background/50 p-3">
+                <div className="rounded-xl bg-background/50 p-4">
                     <div className="mb-1 flex items-center gap-1.5 text-text-muted">
                         <DollarSign size={12} />
                         <span className="text-xs">Monthly Spend</span>
                     </div>
                     <p className="text-lg font-bold text-text-primary">{formatCurrency(stats.spend)}</p>
                 </div>
-                <div className="rounded-lg bg-background/50 p-3">
+                <div className="rounded-xl bg-background/50 p-4">
                     <div className="mb-1 flex items-center gap-1.5 text-text-muted">
                         <CalendarCheck size={12} />
                         <span className="text-xs">Meetings</span>
                     </div>
                     <p className="text-lg font-bold text-text-primary">{formatNumber(stats.meetings)}</p>
                 </div>
-                <div className="rounded-lg bg-background/50 p-3">
+                <div className="rounded-xl bg-background/50 p-4">
                     <div className="mb-1 flex items-center gap-1.5 text-text-muted">
                         <DollarSign size={12} />
                         <span className="text-xs">Cost / Meeting</span>
                     </div>
                     <p className="text-lg font-bold text-text-primary">{formatCurrency(stats.costPerMeeting)}</p>
                 </div>
-                <div className="rounded-lg bg-background/50 p-3">
+                <div className="rounded-xl bg-background/50 p-4">
                     <div className="mb-1 flex items-center gap-1.5 text-text-muted">
                         <Target size={12} />
                         <span className="text-xs">Opportunities</span>
@@ -135,17 +148,11 @@ function ROICardSingle({ config }: { config: ROICardConfig }) {
                                 dataKey="name"
                                 axisLine={false}
                                 tickLine={false}
-                                tick={{ fill: "#8B8B9E", fontSize: 11 }}
+                                tick={{ fill: "var(--txt-mut)", fontSize: 11 }}
                                 width={55}
                             />
                             <Tooltip
-                                contentStyle={{
-                                    backgroundColor: "#1A1A23",
-                                    border: "1px solid #2A2A3A",
-                                    borderRadius: "8px",
-                                    color: "#F1F1F4",
-                                    fontSize: "12px",
-                                }}
+                                contentStyle={getTooltipStyle()}
                                 formatter={(value: number | undefined) => formatCurrency(value ?? 0)}
                             />
                             <Bar dataKey="value" radius={[0, 6, 6, 0]} barSize={16}>
@@ -159,7 +166,7 @@ function ROICardSingle({ config }: { config: ROICardConfig }) {
             </div>
 
             {/* Pipeline Value */}
-            <div className="flex items-center justify-between rounded-lg border border-border-subtle p-3">
+            <div className="flex items-center justify-between rounded-xl bg-background/50 p-4">
                 <span className="text-xs text-text-muted">Pipeline Value</span>
                 <span className="text-base font-bold" style={{ color: config.color }}>
                     {formatCurrency(stats.pipelineValue)}
@@ -179,7 +186,7 @@ export default function ROICards() {
                 </div>
                 <Link
                     href="/settings"
-                    className="flex min-h-[2.75rem] items-center gap-2 rounded-lg border border-border px-3 py-2 text-xs font-medium text-text-muted transition-colors hover:bg-surface-hover hover:text-text-primary"
+                    className="flex min-h-[2.75rem] items-center gap-2 rounded-full bg-surface px-4 py-2 text-xs font-medium text-text-muted shadow-sm transition-colors hover:bg-surface-hover hover:text-text-primary"
                 >
                     <Settings size={14} />
                     Edit Spend

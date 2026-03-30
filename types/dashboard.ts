@@ -90,10 +90,8 @@ export interface SparklinePoint {
 /** API connection status */
 export type ApiConnectionStatus = "connected" | "disconnected" | "error" | "loading";
 
-/** Instantly API analytics overview response */
+/** Instantly API analytics overview response (normalized by our proxy route) */
 export interface InstantlyAnalyticsOverview {
-    campaign_id?: string;
-    campaign_name?: string;
     total_emails_sent: number;
     emails_read: number;
     new_leads_contacted: number;
@@ -103,20 +101,14 @@ export interface InstantlyAnalyticsOverview {
     total_replies: number;
     bounced: number;
     unsubscribed: number;
+    total_meeting_booked: number;
+    total_meeting_completed: number;
+    total_opportunity_value: number;
+    contacted_count: number;
 }
 
-/** Per-campaign analytics from Instantly */
-export interface InstantlyCampaignAnalytics {
-    totalEmailsSent: number;
-    emailsRead: number;
-    newLeadsContacted: number;
-    leadsReplied: number;
-    leadsInterested: number;
-    totalOpportunities: number;
-    totalReplies: number;
-    bounced: number;
-    unsubscribed: number;
-}
+/** Per-campaign analytics (same shape as overview, normalized by proxy route) */
+export type InstantlyCampaignAnalytics = InstantlyAnalyticsOverview;
 
 /** Instantly campaign from API */
 export interface InstantlyCampaign {

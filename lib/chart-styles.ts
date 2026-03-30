@@ -2,11 +2,12 @@
 export function getTooltipStyle(): React.CSSProperties {
     return {
         backgroundColor: "var(--tooltip-bg)",
-        border: "1px solid var(--tooltip-border)",
-        borderRadius: "8px",
+        border: "none",
+        borderRadius: "12px",
         color: "var(--tooltip-text)",
         fontSize: "12px",
-        boxShadow: "0 4px 12px var(--card-shadow)",
+        boxShadow: "0 4px 20px rgba(0, 0, 0, 0.12)",
+        padding: "10px 14px",
     };
 }
 

@@ -21,7 +21,7 @@ interface TotalMetricProps {
 function TotalMetric({ label, value, change, icon }: TotalMetricProps) {
     const isPositive = (change ?? 0) >= 0;
     return (
-        <div className="flex items-center gap-3 rounded-lg bg-background/50 p-3">
+        <div className="flex items-center gap-3 rounded-xl bg-background/50 p-4">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
                 {icon}
             </div>
@@ -57,7 +57,7 @@ export default function AggregatedCard() {
     const isAnyRealData = instantlyConnected || heyreachConnected;
 
     const totalLeadsContacted = isAnyRealData
-        ? (instantlyConnected ? (instantlyData?.overview?.total_emails_sent ?? 0) : 0) +
+        ? (instantlyConnected ? (instantlyData?.overview?.new_leads_contacted ?? 0) : 0) +
           (heyreachConnected ? (heyreachData?.totalStats?.connectionRequestsSent ?? 0) : 0)
         : mockData.totalLeadsContacted;
 
@@ -67,11 +67,11 @@ export default function AggregatedCard() {
         : mockData.totalResponses;
 
     const totalMeetingsBooked = isAnyRealData
-        ? (instantlyConnected ? (instantlyData?.overview?.total_opportunities ?? 0) : 0)
+        ? (instantlyConnected ? (instantlyData?.overview?.total_meeting_booked ?? 0) : 0)
         : mockData.totalMeetingsBooked;
 
     const instantlyMeetings = instantlyConnected
-        ? (instantlyData?.overview?.total_opportunities ?? 0)
+        ? (instantlyData?.overview?.total_meeting_booked ?? 0)
         : mockData.meetingsByPlatform.instantly;
 
     const heyreachMeetings = heyreachConnected
@@ -88,7 +88,7 @@ export default function AggregatedCard() {
     const isLoading = false; // Both hooks handle their own loading
 
     return (
-        <article className="card-hover flex flex-col rounded-xl border border-border bg-surface p-5 animate-fade-in">
+        <article className="card-hover flex flex-col rounded-2xl bg-surface p-6 animate-fade-in" style={{ boxShadow: "var(--card-shadow)" }}>
             {/* Header */}
             <div className="mb-4 flex items-center justify-between">
                 <div>
