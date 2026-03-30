@@ -88,7 +88,8 @@ export default function AggregatedCard() {
     const isLoading = false; // Both hooks handle their own loading
 
     return (
-        <article className="card-hover flex flex-col rounded-2xl bg-surface p-6 animate-fade-in" style={{ boxShadow: "var(--card-shadow)" }}>
+        <div className="card-glow animate-fade-in">
+        <article className="flex flex-col rounded-2xl bg-surface p-6">
             {/* Header */}
             <div className="mb-4 flex items-center justify-between">
                 <div>
@@ -166,5 +167,6 @@ export default function AggregatedCard() {
                 </div>
             </div>
         </article>
+        </div>
     );
 }

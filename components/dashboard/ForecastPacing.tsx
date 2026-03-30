@@ -33,7 +33,8 @@ export default function ForecastPacing() {
     const pacingBarWidth = Math.min(100, pacing.pacingPercent);
 
     return (
-        <article className="animate-fade-in rounded-2xl bg-surface p-6" style={{ boxShadow: "var(--card-shadow)" }}>
+        <div className="card-glow animate-fade-in">
+        <article className="rounded-2xl bg-surface p-6">
             {/* Header */}
             <div className="mb-4 flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -111,5 +112,6 @@ export default function ForecastPacing() {
                 </div>
             </div>
         </article>
+        </div>
     );
 }

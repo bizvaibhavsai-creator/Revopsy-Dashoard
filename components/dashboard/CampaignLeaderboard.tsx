@@ -153,7 +153,8 @@ export default function CampaignLeaderboard() {
     const criticalCt = campaignsWithHealth.filter((c) => c.health.level === "critical").length;
 
     return (
-        <section id="campaigns" className="animate-fade-in rounded-2xl bg-surface overflow-hidden" style={{ boxShadow: "var(--card-shadow)" }}>
+        <div className="card-glow animate-fade-in">
+        <section id="campaigns" className="rounded-2xl bg-surface overflow-hidden">
             {/* Header */}
             <div className="flex items-center justify-between border-b border-border-subtle p-6">
                 <div>
@@ -284,5 +285,6 @@ export default function CampaignLeaderboard() {
                 <div className="flex h-40 items-center justify-center text-sm text-text-muted">No campaigns found</div>
             )}
         </section>
+        </div>
     );
 }

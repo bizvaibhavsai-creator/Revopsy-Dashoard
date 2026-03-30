@@ -10,8 +10,8 @@ export const TIME_RANGE_OPTIONS: { label: string; value: TimeRange }[] = [
 
 /** Chart color palette */
 export const CHART_COLORS = {
-    instantly: "#dc684f",
-    heyreach: "#F4A261",
+    instantly: "#c45a3c",
+    heyreach: "#d4894e",
     positive: "#34D399",
     negative: "#F87171",
     muted: "#8B8B9E",

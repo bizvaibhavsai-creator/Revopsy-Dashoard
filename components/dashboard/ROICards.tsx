@@ -13,7 +13,7 @@ import {
     ArrowRight,
 } from "lucide-react";
 import Link from "next/link";
-import { formatCurrency, formatNumber } from "@/lib/utils";
+import { cn, formatCurrency, formatNumber } from "@/lib/utils";
 import { getInstantlyMetrics, getHeyReachMetrics } from "@/lib/mock-data";
 import { useDashboardStore, useSettingsStore } from "@/lib/store";
 import { useInstantly } from "@/hooks/use-instantly";
@@ -83,7 +83,8 @@ function ROICardSingle({ config }: { config: ROICardConfig }) {
     ];
 
     return (
-        <article className="card-hover rounded-2xl bg-surface p-6 animate-fade-in" style={{ boxShadow: "var(--card-shadow)" }}>
+        <div className={cn("animate-fade-in", config.platform === "instantly" ? "card-glow-warm" : "card-glow-cool")}>
+        <article className="rounded-2xl bg-surface p-6">
             {/* Header */}
             <div className="mb-5 flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -173,6 +174,7 @@ function ROICardSingle({ config }: { config: ROICardConfig }) {
                 </span>
             </div>
         </article>
+        </div>
     );
 }
 

@@ -31,10 +31,10 @@ export default function ChannelAnalyticsChart() {
     const isAnyRealData = iConnected || hConnected;
 
     return (
+        <div className="card-glow animate-fade-in">
         <section
             id="analytics"
-            className="animate-fade-in rounded-2xl bg-surface p-6"
-            style={{ boxShadow: "var(--card-shadow)" }}
+            className="rounded-2xl bg-surface p-6"
         >
             {/* Header */}
             <div className="mb-5 flex items-center justify-between">
@@ -130,5 +130,6 @@ export default function ChannelAnalyticsChart() {
                 </ResponsiveContainer>
             </div>
         </section>
+        </div>
     );
 }

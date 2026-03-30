@@ -90,7 +90,8 @@ export default function InstantlyCard() {
     const showChart = chartData.length > 0;
 
     return (
-        <article className="card-hover rounded-2xl bg-surface p-6 animate-fade-in" style={{ boxShadow: "var(--card-shadow)" }}>
+        <div className="card-glow-warm animate-fade-in">
+        <article className="rounded-2xl bg-surface p-6">
             {/* Header */}
             <div className="mb-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -184,5 +185,6 @@ export default function InstantlyCard() {
                 )}
             </div>
         </article>
+        </div>
     );
 }

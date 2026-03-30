@@ -76,7 +76,8 @@ export default function RecommendationsPanel() {
     const recs = useMemo(() => generateRecommendations(campaigns), [campaigns]);
 
     return (
-        <section className="animate-fade-in rounded-2xl bg-surface overflow-hidden" style={{ boxShadow: "var(--card-shadow)" }}>
+        <div className="card-glow animate-fade-in">
+        <section className="rounded-2xl bg-surface overflow-hidden">
             <div className="flex items-center justify-between border-b border-border-subtle p-6">
                 <div className="flex items-center gap-2">
                     <Lightbulb size={18} className="text-primary" />
@@ -123,5 +124,6 @@ export default function RecommendationsPanel() {
                 </div>
             )}
         </section>
+        </div>
     );
 }
