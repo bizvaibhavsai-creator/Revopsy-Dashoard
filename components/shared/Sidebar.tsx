@@ -84,9 +84,12 @@ export default function Sidebar() {
                     </p>
                     <ul className="space-y-1" role="list">
                         {managementItems.map((item) => {
-                            const isActive = item.href === "/dashboard"
-                                ? pathname === "/dashboard"
-                                : pathname === item.href || pathname.startsWith(item.href.split("#")[0]);
+                            // Hash links (#analytics, #campaigns) are sections on /dashboard — never highlight as "active page"
+                            const isActive = item.href.includes("#")
+                                ? false
+                                : item.href === "/dashboard"
+                                    ? pathname === "/dashboard"
+                                    : pathname === item.href;
                             return (
                                 <li key={item.href}>
                                     <Link
