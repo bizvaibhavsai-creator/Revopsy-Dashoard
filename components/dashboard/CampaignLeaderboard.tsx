@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ArrowUpDown, ExternalLink, Loader2, ChevronDown, ChevronRight } from "lucide-react";
+import { ArrowUpDown, ExternalLink, Loader2, ChevronDown, ChevronRight, Filter } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getCampaigns } from "@/lib/mock-data";
 import { useInstantly } from "@/hooks/use-instantly";
@@ -55,6 +55,8 @@ export default function CampaignLeaderboard() {
     const [sortKey, setSortKey] = useState<SortKey>("healthScore");
     const [sortDir, setSortDir] = useState<"asc" | "desc">("asc"); // critical first
     const [expandedId, setExpandedId] = useState<string | null>(null);
+    const [statusFilter, setStatusFilter] = useState<"all" | "active" | "paused" | "completed" | "draft">("all");
+    const [showStatusDropdown, setShowStatusDropdown] = useState(false);
 
     const isAnyRealData = iConnected || hConnected;
     const isLoading = (iHasKey && iLoading) || (hHasKey && hLoading);
@@ -92,7 +94,6 @@ export default function CampaignLeaderboard() {
                 for (const c of heyreachData.campaigns) {
                     const stats = c.stats;
                     const connSent = stats?.connectionRequestsSent ?? 0;
-                    const connAccepted = stats?.connectionsAccepted ?? 0;
                     const msgSent = stats?.messagesSent ?? 0;
                     const msgReceived = stats?.messagesReceived ?? 0;
                     const totalOutbound = connSent + msgSent;
@@ -113,7 +114,10 @@ export default function CampaignLeaderboard() {
     }, [isAnyRealData, iConnected, hConnected, instantlyData, heyreachData]);
 
     const sorted = useMemo(() => {
-        return [...campaignsWithHealth].sort((a, b) => {
+        const filtered = statusFilter === "all"
+            ? campaignsWithHealth
+            : campaignsWithHealth.filter((c) => c.status === statusFilter);
+        return [...filtered].sort((a, b) => {
             let diff: number;
             if (sortKey === "healthScore") {
                 diff = a.health.score - b.health.score;
@@ -122,7 +126,7 @@ export default function CampaignLeaderboard() {
             }
             return sortDir === "desc" ? -diff : diff;
         });
-    }, [campaignsWithHealth, sortKey, sortDir]);
+    }, [campaignsWithHealth, sortKey, sortDir, statusFilter]);
 
     const handleSort = (key: SortKey) => {
         if (sortKey === key) {
@@ -152,6 +156,17 @@ export default function CampaignLeaderboard() {
     const warningCt = campaignsWithHealth.filter((c) => c.health.level === "warning").length;
     const criticalCt = campaignsWithHealth.filter((c) => c.health.level === "critical").length;
 
+    // Available status options with counts
+    const statusOptions = useMemo(() => {
+        const counts: Record<string, number> = {};
+        for (const c of campaignsWithHealth) {
+            counts[c.status] = (counts[c.status] || 0) + 1;
+        }
+        return Object.entries(counts)
+            .sort(([a], [b]) => a.localeCompare(b))
+            .map(([status, count]) => ({ status, count }));
+    }, [campaignsWithHealth]);
+
     return (
         <div className="card-glow animate-fade-in">
         <section id="campaigns" className="rounded-2xl bg-surface overflow-hidden">
@@ -159,8 +174,8 @@ export default function CampaignLeaderboard() {
             <div className="flex items-center justify-between border-b border-border-subtle p-6">
                 <div>
                     <h2 className="text-base font-semibold text-text-primary">Campaign Leaderboard</h2>
-                    <div className="mt-1 flex items-center gap-3 text-xs text-text-muted">
-                        <span>{sorted.length} campaigns</span>
+                    <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-text-muted">
+                        <span>{sorted.length}{statusFilter !== "all" ? ` ${statusFilter}` : ""} campaign{sorted.length !== 1 ? "s" : ""}{statusFilter !== "all" ? ` of ${campaignsWithHealth.length}` : ""}</span>
                         <span className="text-success">● {healthyCt} healthy</span>
                         {warningCt > 0 && <span className="text-warning">● {warningCt} warning</span>}
                         {criticalCt > 0 && <span className="text-danger">● {criticalCt} critical</span>}
@@ -193,7 +208,55 @@ export default function CampaignLeaderboard() {
                                 <th className="px-3 py-3 text-left"><SortButton label="Reply %" field="replyRate" /></th>
                                 <th className="px-3 py-3 text-left"><SortButton label="Positive" field="positiveReplies" /></th>
                                 <th className="px-3 py-3 text-left"><SortButton label="Meetings" field="meetingsBooked" /></th>
-                                <th className="px-3 py-3 text-left text-xs font-medium uppercase tracking-wider text-text-muted">Status</th>
+                                <th className="px-3 py-3 text-left">
+                                    <div className="relative">
+                                        <button
+                                            onClick={() => setShowStatusDropdown(!showStatusDropdown)}
+                                            className={cn(
+                                                "flex min-h-[2.75rem] items-center gap-1.5 text-xs font-medium uppercase tracking-wider transition-colors hover:text-text-primary",
+                                                statusFilter !== "all" ? "text-primary" : "text-text-muted"
+                                            )}
+                                            aria-label="Filter by status"
+                                        >
+                                            <Filter size={12} />
+                                            {statusFilter === "all" ? "Status" : statusFilter}
+                                            <ChevronDown size={10} />
+                                        </button>
+                                        {showStatusDropdown && (
+                                            <>
+                                                <div className="fixed inset-0 z-40" onClick={() => setShowStatusDropdown(false)} />
+                                                <div className="absolute left-0 top-10 z-50 w-44 rounded-xl bg-surface py-1" style={{ boxShadow: "0 8px 32px rgba(0,0,0,0.25)" }}>
+                                                    <button
+                                                        onClick={() => { setStatusFilter("all"); setShowStatusDropdown(false); }}
+                                                        className={cn(
+                                                            "flex w-full items-center justify-between px-3 py-2 text-xs transition-colors hover:bg-surface-hover",
+                                                            statusFilter === "all" ? "text-primary font-semibold" : "text-text-secondary"
+                                                        )}
+                                                    >
+                                                        All Statuses
+                                                        <span className="text-text-muted">{campaignsWithHealth.length}</span>
+                                                    </button>
+                                                    {statusOptions.map(({ status, count }) => (
+                                                        <button
+                                                            key={status}
+                                                            onClick={() => { setStatusFilter(status as typeof statusFilter); setShowStatusDropdown(false); }}
+                                                            className={cn(
+                                                                "flex w-full items-center justify-between px-3 py-2 text-xs capitalize transition-colors hover:bg-surface-hover",
+                                                                statusFilter === status ? "text-primary font-semibold" : "text-text-secondary"
+                                                            )}
+                                                        >
+                                                            <div className="flex items-center gap-2">
+                                                                <span className={cn("inline-block h-2 w-2 rounded-full", STATUS_STYLES[status]?.split(" ")[0] || "bg-text-muted/30")} />
+                                                                {status}
+                                                            </div>
+                                                            <span className="text-text-muted">{count}</span>
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
+                                </th>
                                 <th className="px-3 py-3 text-right text-xs font-medium uppercase tracking-wider text-text-muted"><span className="sr-only">Actions</span></th>
                             </tr>
                         </thead>
